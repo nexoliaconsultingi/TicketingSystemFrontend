@@ -7,6 +7,7 @@ import {
   Boxes,
   Check,
   Droplet,
+  Eye,
   Keyboard,
   Laptop,
   Loader2,
@@ -30,6 +31,7 @@ import {
 import { AdminGuard } from "@/components/auth/admin-guard"
 import { MaterialImagePicker } from "@/components/assets/material-image-picker"
 import { DashboardShell } from "@/components/layout/dashboard-shell"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -51,7 +53,7 @@ import {
   type MaterialUnit,
   type UpdateMaterialInput,
 } from "@/lib/api"
-import { getToken } from "@/lib/auth"
+import { getInitials, getToken } from "@/lib/auth"
 import { connectRealtime } from "@/lib/realtime"
 import { useSessionUser } from "@/lib/use-session"
 
@@ -143,6 +145,9 @@ function Assets() {
   const [returning, setReturning] = useState<MaterialReturnLine | null>(null)
   const [returnQuantity, setReturnQuantity] = useState("")
   const [returnError, setReturnError] = useState<string | null>(null)
+
+  const [selectedItem, setSelectedItem] = useState<MaterialItemResponse | null>(null)
+  const [selectedReturn, setSelectedReturn] = useState<MaterialReturnLine | null>(null)
 
   const load = async (options?: { silent?: boolean }) => {
     const token = getToken()
@@ -413,6 +418,7 @@ function Assets() {
             onSearch={setSearch}
             onCategory={setCategory}
             onEdit={openEdit}
+            onViewDetails={setSelectedItem}
             onDelete={(item) => {
               setDeleting(item)
               setFormError(null)
@@ -423,6 +429,7 @@ function Assets() {
             returns={returns}
             loading={loading}
             onReturn={openReturn}
+            onViewDetails={setSelectedReturn}
             onRefresh={() => void load({ silent: true })}
           />
         )}
@@ -753,6 +760,226 @@ function Assets() {
           )}
         </div>
       </Modal>
+
+      <Modal
+        open={selectedItem !== null}
+        title={selectedItem ? selectedItem.name : "Product details"}
+        description={selectedItem ? `Code: ${selectedItem.code}` : undefined}
+        onClose={() => setSelectedItem(null)}
+        size="md"
+        centerOnMobile
+        footer={
+          <Button
+            type="button"
+            variant="ghost"
+            className="text-slate-500"
+            onClick={() => setSelectedItem(null)}
+          >
+            Close
+          </Button>
+        }
+      >
+        {selectedItem && (
+          <div className="space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#edf8f8] text-[#1aa6a6]">
+                {selectedItem.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={selectedItem.image} alt={selectedItem.name} className="size-full object-cover" />
+                ) : (
+                  <Package className="size-6" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className="border-[#e5eaf2] bg-slate-50 font-mono text-[11px] text-slate-500"
+                  >
+                    {selectedItem.code}
+                  </Badge>
+                  <Badge
+                    variant="outline"
+                    className={
+                      selectedItem.stockQuantity > 0
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "border-red-200 bg-red-50 text-red-700"
+                    }
+                  >
+                    {formatStockQuantity(selectedItem.stockQuantity, selectedItem.unit)}
+                  </Badge>
+                  <Badge
+                    variant="outline"
+                    className={
+                      selectedItem.reusable
+                        ? "border-[#cde8e8] bg-[#edf8f8] text-[#1a6a9c]"
+                        : "border-amber-200 bg-amber-50 text-amber-700"
+                    }
+                  >
+                    {selectedItem.reusable ? "Reusable" : "Consumed on use"}
+                  </Badge>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-[12px] text-slate-500">
+                  <span className="inline-flex items-center gap-1">
+                    <Wrench className="size-3.5" />
+                    {MATERIAL_CATEGORY_LABELS[selectedItem.category]}
+                  </span>
+                  {[selectedItem.brand, selectedItem.model].filter(Boolean).length > 0 && (
+                    <span>{[selectedItem.brand, selectedItem.model].filter(Boolean).join(" · ")}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {selectedItem.description && (
+              <div>
+                <p className="text-[12px] font-medium text-[#183b56]">Description</p>
+                <p className="mt-1.5 text-[13px] leading-5 whitespace-pre-wrap text-slate-600">
+                  {selectedItem.description}
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-3 text-[12px] text-slate-500">
+              {selectedItem.createdByName && (
+                <span className="inline-flex items-center gap-1">
+                  <Avatar className="size-4">
+                    {selectedItem.createdByPhoto ? (
+                      <AvatarImage src={selectedItem.createdByPhoto} alt="" />
+                    ) : null}
+                    <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                      {getInitials(selectedItem.createdByName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  added by {selectedItem.createdByName}
+                </span>
+              )}
+              <span>
+                Added {new Date(selectedItem.createdAt).toLocaleString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+              {selectedItem.updatedAt !== selectedItem.createdAt && (
+                <span>
+                  Updated {new Date(selectedItem.updatedAt).toLocaleString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        open={selectedReturn !== null}
+        title={selectedReturn ? `Return details — ${selectedReturn.name}` : "Return details"}
+        description={selectedReturn ? `${selectedReturn.remaining} of ${selectedReturn.quantity} unit${selectedReturn.quantity === 1 ? "" : "s"} still outstanding` : undefined}
+        onClose={() => setSelectedReturn(null)}
+        size="md"
+        centerOnMobile
+        footer={
+          <Button
+            type="button"
+            variant="ghost"
+            className="text-slate-500"
+            onClick={() => setSelectedReturn(null)}
+          >
+            Close
+          </Button>
+        }
+      >
+        {selectedReturn && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                variant="outline"
+                className="border-[#e5eaf2] bg-slate-50 font-mono text-[11px] text-slate-500"
+              >
+                {selectedReturn.code}
+              </Badge>
+              <Badge variant="outline" className="border-amber-200 bg-amber-50 text-amber-700">
+                {selectedReturn.remaining} of {selectedReturn.quantity} out
+              </Badge>
+              <Badge variant="outline" className="border-[#cde8e8] bg-[#edf8f8] text-[#1a6a9c]">
+                {MATERIAL_CATEGORY_LABELS[selectedReturn.category]}
+              </Badge>
+              <Badge variant="outline" className="border-[#e5eaf2] bg-slate-50 text-slate-500">
+                {selectedReturn.unit}
+              </Badge>
+            </div>
+
+            <div className="space-y-2 text-[13px] text-slate-600">
+              {selectedReturn.employeeName && (
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">Held by</span>
+                  <span className="inline-flex items-center gap-1 font-medium text-[#1a6a9c]">
+                    <Avatar className="size-4">
+                      {selectedReturn.employeePhoto ? (
+                        <AvatarImage src={selectedReturn.employeePhoto} alt="" />
+                      ) : null}
+                      <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                        {getInitials(selectedReturn.employeeName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    {selectedReturn.employeeName}
+                  </span>
+                </div>
+              )}
+              {selectedReturn.ticketReference && (
+                <div>
+                  <span className="text-slate-500">Ticket</span>{" "}
+                  <span className="font-medium text-[#183b56]">{selectedReturn.ticketReference}</span>
+                </div>
+              )}
+              {selectedReturn.releasedByName && (
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">Released by</span>
+                  <span className="inline-flex items-center gap-1 font-medium text-[#183b56]">
+                    <Avatar className="size-4">
+                      {selectedReturn.releasedByPhoto ? (
+                        <AvatarImage src={selectedReturn.releasedByPhoto} alt="" />
+                      ) : null}
+                      <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                        {getInitials(selectedReturn.releasedByName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    {selectedReturn.releasedByName}
+                  </span>
+                </div>
+              )}
+              {selectedReturn.releasedAt && (
+                <div>
+                  <span className="text-slate-500">Released</span>{" "}
+                  <span className="font-medium text-[#183b56]">
+                    {new Date(selectedReturn.releasedAt).toLocaleString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+              )}
+              <div>
+                <span className="text-slate-500">Returned</span>{" "}
+                <span className="font-medium text-[#183b56]">
+                  {selectedReturn.returned} / {selectedReturn.quantity}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </DashboardShell>
   )
 }
@@ -768,6 +995,7 @@ function InventoryTab({
   onSearch,
   onCategory,
   onEdit,
+  onViewDetails,
   onDelete,
 }: {
   items: MaterialItemResponse[]
@@ -780,6 +1008,7 @@ function InventoryTab({
   onSearch: (value: string) => void
   onCategory: (value: string) => void
   onEdit: (item: MaterialItemResponse) => void
+  onViewDetails: (item: MaterialItemResponse) => void
   onDelete: (item: MaterialItemResponse) => void
 }) {
   return (
@@ -902,13 +1131,34 @@ function InventoryTab({
                           <Wrench className="size-3.5" />
                           {MATERIAL_CATEGORY_LABELS[item.category]}
                         </span>
-                        {item.createdByName && <span>added by {item.createdByName}</span>}
+                        {item.createdByName && (
+                          <span className="inline-flex items-center gap-1">
+                            <Avatar className="size-4">
+                              {item.createdByPhoto ? (
+                                <AvatarImage src={item.createdByPhoto} alt="" />
+                              ) : null}
+                              <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                                {getInitials(item.createdByName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            added by {item.createdByName}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {isAdmin && (
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 border-[#dce5ed] text-[#183b56]"
+                        onClick={() => onViewDetails(item)}
+                      >
+                        <Eye className="size-3.5" />
+                        View details
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -929,6 +1179,19 @@ function InventoryTab({
                       </Button>
                     </div>
                   )}
+                  {!isAdmin && (
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 border-[#dce5ed] text-[#183b56]"
+                        onClick={() => onViewDetails(item)}
+                      >
+                        <Eye className="size-3.5" />
+                        View details
+                      </Button>
+                    </div>
+                  )}
                 </li>
               )
             })}
@@ -943,11 +1206,13 @@ function ReturnsTab({
   returns,
   loading,
   onReturn,
+  onViewDetails,
   onRefresh,
 }: {
   returns: MaterialReturnLine[]
   loading: boolean
   onReturn: (line: MaterialReturnLine) => void
+  onViewDetails: (line: MaterialReturnLine) => void
   onRefresh: () => void
 }) {
   return (
@@ -1010,23 +1275,54 @@ function ReturnsTab({
                   </span>
                   {line.employeeName && (
                     <span className="inline-flex items-center gap-1 text-[#1a6a9c]">
+                      <Avatar className="size-4">
+                        {line.employeePhoto ? (
+                          <AvatarImage src={line.employeePhoto} alt="" />
+                        ) : null}
+                        <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                          {getInitials(line.employeeName)}
+                        </AvatarFallback>
+                      </Avatar>
                       {line.employeeName}
                       {line.ticketReference ? ` · ${line.ticketReference}` : ""}
                     </span>
                   )}
-                  {line.releasedByName && <span>released by {line.releasedByName}</span>}
+                  {line.releasedByName && (
+                    <span className="inline-flex items-center gap-1">
+                      <Avatar className="size-4">
+                        {line.releasedByPhoto ? (
+                          <AvatarImage src={line.releasedByPhoto} alt="" />
+                        ) : null}
+                        <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                          {getInitials(line.releasedByName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      released by {line.releasedByName}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="shrink-0 gap-2 border-[#cde8e8] text-[#176b6b] hover:bg-[#edf8f8]"
-                onClick={() => onReturn(line)}
-              >
-                <Undo2 className="size-3.5" />
-                Return
-              </Button>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-[#cde8e8] text-[#176b6b] hover:bg-[#edf8f8]"
+                  onClick={() => onViewDetails(line)}
+                >
+                  <Eye className="size-3.5" />
+                  View return details
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-[#cde8e8] text-[#176b6b] hover:bg-[#edf8f8]"
+                  onClick={() => onReturn(line)}
+                >
+                  <Undo2 className="size-3.5" />
+                  Return
+                </Button>
+              </div>
             </li>
           ))}
         </ul>

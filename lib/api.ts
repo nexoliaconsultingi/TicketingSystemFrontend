@@ -913,6 +913,7 @@ export interface TicketReleasedMaterial {
   returnedByName: string
   releasedAt: string | null
   releasedByName: string
+  releasedByPhoto: string
 }
 
 /** Une ligne du formulaire d'acceptation : produit, quantité, usage. */
@@ -1150,6 +1151,7 @@ export interface MaterialItemResponse {
   /** Photo du produit en data URI base64, vide si aucune. */
   image: string
   createdBy: string | null
+  createdByPhoto: string
   createdByName: string
   createdAt: string
   updatedAt: string
@@ -1175,6 +1177,8 @@ export interface MaterialReturnLine {
   ticketId: string
   ticketReference: string
   employeeName: string
+  /** Photo de profil de l'employé (data URI), vide s'il en a pas. */
+  employeePhoto: string
   materialId: string
   code: string
   name: string
@@ -1185,6 +1189,7 @@ export interface MaterialReturnLine {
   remaining: number
   releasedAt: string | null
   releasedByName: string
+  releasedByPhoto: string
 }
 
 export const materialApi = {
