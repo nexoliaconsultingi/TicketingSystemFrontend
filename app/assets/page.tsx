@@ -843,11 +843,11 @@ function Assets() {
             <div className="flex flex-wrap items-center gap-3 text-[12px] text-slate-500">
               {selectedItem.createdByName && (
                 <span className="inline-flex items-center gap-1">
-                  <Avatar className="size-4">
+                  <Avatar className="size-10">
                     {selectedItem.createdByPhoto ? (
                       <AvatarImage src={selectedItem.createdByPhoto} alt="" />
                     ) : null}
-                    <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                    <AvatarFallback className="bg-[#d7eeee] text-[13px] font-semibold text-[#176b6b]">
                       {getInitials(selectedItem.createdByName)}
                     </AvatarFallback>
                   </Avatar>
@@ -922,11 +922,11 @@ function Assets() {
                 <div className="flex items-center gap-2">
                   <span className="text-slate-500">Held by</span>
                   <span className="inline-flex items-center gap-1 font-medium text-[#1a6a9c]">
-                    <Avatar className="size-4">
+                    <Avatar className="size-10">
                       {selectedReturn.employeePhoto ? (
                         <AvatarImage src={selectedReturn.employeePhoto} alt="" />
                       ) : null}
-                      <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                      <AvatarFallback className="bg-[#d7eeee] text-[13px] font-semibold text-[#176b6b]">
                         {getInitials(selectedReturn.employeeName)}
                       </AvatarFallback>
                     </Avatar>
@@ -944,11 +944,11 @@ function Assets() {
                 <div className="flex items-center gap-2">
                   <span className="text-slate-500">Released by</span>
                   <span className="inline-flex items-center gap-1 font-medium text-[#183b56]">
-                    <Avatar className="size-4">
+                    <Avatar className="size-10">
                       {selectedReturn.releasedByPhoto ? (
                         <AvatarImage src={selectedReturn.releasedByPhoto} alt="" />
                       ) : null}
-                      <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                      <AvatarFallback className="bg-[#d7eeee] text-[13px] font-semibold text-[#176b6b]">
                         {getInitials(selectedReturn.releasedByName)}
                       </AvatarFallback>
                     </Avatar>
@@ -1132,12 +1132,12 @@ function InventoryTab({
                           {MATERIAL_CATEGORY_LABELS[item.category]}
                         </span>
                         {item.createdByName && (
-                          <span className="inline-flex items-center gap-1">
-                            <Avatar className="size-4">
+                          <span className="inline-flex items-center gap-1.5">
+                            <Avatar className="size-8">
                               {item.createdByPhoto ? (
                                 <AvatarImage src={item.createdByPhoto} alt="" />
                               ) : null}
-                              <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                              <AvatarFallback className="bg-[#d7eeee] text-[11px] font-semibold text-[#176b6b]">
                                 {getInitials(item.createdByName)}
                               </AvatarFallback>
                             </Avatar>
@@ -1274,12 +1274,12 @@ function ReturnsTab({
                     {MATERIAL_CATEGORY_LABELS[line.category]}
                   </span>
                   {line.employeeName && (
-                    <span className="inline-flex items-center gap-1 text-[#1a6a9c]">
-                      <Avatar className="size-4">
+                    <span className="inline-flex items-center gap-1.5 text-[#1a6a9c]">
+                      <Avatar className="size-8">
                         {line.employeePhoto ? (
                           <AvatarImage src={line.employeePhoto} alt="" />
                         ) : null}
-                        <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                        <AvatarFallback className="bg-[#d7eeee] text-[11px] font-semibold text-[#176b6b]">
                           {getInitials(line.employeeName)}
                         </AvatarFallback>
                       </Avatar>
@@ -1288,12 +1288,12 @@ function ReturnsTab({
                     </span>
                   )}
                   {line.releasedByName && (
-                    <span className="inline-flex items-center gap-1">
-                      <Avatar className="size-4">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Avatar className="size-8">
                         {line.releasedByPhoto ? (
                           <AvatarImage src={line.releasedByPhoto} alt="" />
                         ) : null}
-                        <AvatarFallback className="bg-[#d7eeee] text-[9px] font-semibold text-[#176b6b]">
+                        <AvatarFallback className="bg-[#d7eeee] text-[11px] font-semibold text-[#176b6b]">
                           {getInitials(line.releasedByName)}
                         </AvatarFallback>
                       </Avatar>

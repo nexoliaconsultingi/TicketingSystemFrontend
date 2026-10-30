@@ -137,8 +137,8 @@ export function useVoiceSearch({ lang, onResult }: VoiceSearchOptions): VoiceSea
         if (event.error === "no-speech" || event.error === "aborted") return
         setError(
           event.error === "not-allowed"
-            ? "Microphone access was refused. Allow it in your browser settings to search by voice."
-            : `Voice search failed (${event.error}).`,
+            ? "Microphone access was refused. Allow it in your browser settings to use voice input."
+            : `Voice input failed (${event.error}).`,
         )
       }
 

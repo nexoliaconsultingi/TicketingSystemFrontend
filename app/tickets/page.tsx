@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, Suspense } from "rea
 import {
   Eye,
   Loader2,
+  Mic,
+  MicOff,
   Pencil,
   Plus,
   Send,
@@ -31,6 +33,91 @@ import {
 } from "@/lib/api"
 import { useTicketFeed } from "@/lib/use-ticket-feed"
 import { useHighlightParam } from "@/lib/use-highlight"
+import { useVoiceSearch, type VoiceSearch } from "@/lib/voice-search"
+
+/**
+ * Ajoute une dictée au texte déjà saisi.
+ *
+ * La dictée complète la frappe au clavier au lieu de la remplacer : un
+ * déclarant qui a déjà tapé une phrase peut dicter la suite. L'espace évite de
+ * coller deux mots, et la coupe respecte la limite du champ — le serveur
+ * refuserait un titre de plus de 140 caractères.
+ */
+function appendTranscript(current: string, transcript: string, maxLength: number): string {
+  const base = current.trimEnd()
+  const next = base.length > 0 ? `${base} ${transcript}` : transcript
+  return next.slice(0, maxLength)
+}
+
+/**
+ * Langue de dictée.
+ *
+ * Contrairement à la recherche — où l'anglais est imposé pour retrouver les
+ * noms de l'annuaire — un ticket est rédigé dans la langue du déclarant. On
+ * suit donc celle du navigateur, avec l'anglais en repli.
+ */
+function dictationLang(): string | undefined {
+  if (typeof navigator === "undefined") return undefined
+  return navigator.language
+}
+
+/**
+ * Bouton micro d'un champ de formulaire.
+ *
+ * Même idiome que la recherche globale : caché quand le navigateur n'expose pas
+ * la reconnaissance vocale, état d'écoute visible, `aria-pressed` pour les
+ * lecteurs d'écran.
+ */
+function DictateButton({
+  voice,
+  label,
+}: {
+  voice: Pick<VoiceSearch, "supported" | "listening" | "toggle">
+  label: string
+}) {
+  if (!voice.supported) return null
+  return (
+    <button
+      type="button"
+      aria-label={voice.listening ? `Stop dictating the ${label}` : `Dictate the ${label}`}
+      aria-pressed={voice.listening}
+      title={voice.listening ? "Stop listening" : `Dictate the ${label}`}
+      onClick={voice.toggle}
+      className={
+        voice.listening
+          ? "inline-flex items-center gap-1.5 rounded-full border border-[#1aa6a6] bg-[#edf8f8] px-3 py-1.5 text-xs font-medium text-[#147878]"
+          : "inline-flex items-center gap-1.5 rounded-full border border-[#dce5ed] px-3 py-1.5 text-xs font-medium text-[#183b56] transition-colors hover:border-[#1aa6a6] hover:text-[#147878]"
+      }
+    >
+      {voice.listening ? <MicOff className="size-3.5" /> : <Mic className="size-3.5" />}
+      {voice.listening ? "Stop" : "Dictate"}
+    </button>
+  )
+}
+
+/**
+ * Retour visuel d'une dictée : écoute en cours ou erreur du navigateur.
+ *
+ * Rien n'est rendu au repos, pour ne pas alourdir un formulaire déjà dense.
+ */
+function VoiceHint({ voice }: { voice: Pick<VoiceSearch, "listening" | "error"> }) {
+  if (voice.listening) {
+    return (
+      <span className="flex items-center gap-2 text-[11.5px] text-[#147878]">
+        <span className="size-1.5 animate-pulse rounded-full bg-[#1aa6a6]" />
+        Listening... speak now, the text is added to what is already written.
+      </span>
+    )
+  }
+  if (voice.error) {
+    return (
+      <span role="alert" className="block text-[11.5px] text-amber-700">
+        {voice.error}
+      </span>
+    )
+  }
+  return null
+}
 
 /**
  * Étapes où le demandeur peut encore retirer sa demande.
@@ -368,6 +455,18 @@ function EditDialog({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Deux écoutes indépendantes : dicter le titre ne doit pas couper la dictée
+  // de la description, et chaque champ garde son propre retour visuel.
+  const titleVoice = useVoiceSearch({
+    lang: dictationLang(),
+    onResult: (transcript) => setTitle((current) => appendTranscript(current, transcript, 140)),
+  })
+  const descriptionVoice = useVoiceSearch({
+    lang: dictationLang(),
+    onResult: (transcript) =>
+      setDescription((current) => appendTranscript(current, transcript, 2000)),
+  })
+
   // Le formulaire se remplit à l'ouverture, pas au rendu : `ticket` change à
   // chaque rechargement de la liste, et le ressaisir effacerait ce que le
   // demandeur est en train de corriger.
@@ -379,6 +478,14 @@ function EditDialog({
       setError(null)
     }
   }, [ticket])
+
+  // Une dictée interrompue par la fermeture du dialogue ne doit pas continuer
+  // à écrire dans un formulaire que le demandeur ne voit plus.
+  useEffect(() => {
+    if (ticket !== null) return
+    if (titleVoice.listening) titleVoice.toggle()
+    if (descriptionVoice.listening) descriptionVoice.toggle()
+  }, [ticket, titleVoice.listening, titleVoice.toggle, descriptionVoice.listening, descriptionVoice.toggle])
 
   const tooShort = title.trim().length < 3 || description.trim().length < 5
   // Rien à enregistrer : le bouton reste inactif plutôt que d'appeler le serveur
@@ -438,9 +545,15 @@ function EditDialog({
           </p>
         )}
 
-        <label className="block space-y-1.5">
-          <span className="text-[13px] font-medium text-[#183b56]">Title</span>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor="edit-ticket-title" className="text-[13px] font-medium text-[#183b56]">
+              Title
+            </label>
+            <DictateButton voice={titleVoice} label="title" />
+          </div>
           <Input
+            id="edit-ticket-title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             maxLength={140}
@@ -449,11 +562,21 @@ function EditDialog({
           <span className="block text-[11.5px] text-slate-400">
             A short summary, in one line. At least 3 characters.
           </span>
-        </label>
+          <VoiceHint voice={titleVoice} />
+        </div>
 
-        <label className="block space-y-1.5">
-          <span className="text-[13px] font-medium text-[#183b56]">Description</span>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <label
+              htmlFor="edit-ticket-description"
+              className="text-[13px] font-medium text-[#183b56]"
+            >
+              Description
+            </label>
+            <DictateButton voice={descriptionVoice} label="description" />
+          </div>
           <Textarea
+            id="edit-ticket-description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             rows={5}
@@ -462,7 +585,8 @@ function EditDialog({
           <span className="block text-[11.5px] text-slate-400">
             The more context, the faster it is handled. At least 5 characters.
           </span>
-        </label>
+          <VoiceHint voice={descriptionVoice} />
+        </div>
 
         <label className="block space-y-1.5">
           <span className="text-[13px] font-medium text-[#183b56]">Priority</span>
@@ -508,6 +632,19 @@ function DeclareDialog({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Dictée : le clavier reste le chemin principal, le micro est une aide pour
+  // ceux qui décrivent plus vite qu'ils ne tapent. Chaque champ a sa propre
+  // écoute, sinon dicter la description couperait la dictée du titre.
+  const titleVoice = useVoiceSearch({
+    lang: dictationLang(),
+    onResult: (transcript) => setTitle((current) => appendTranscript(current, transcript, 140)),
+  })
+  const descriptionVoice = useVoiceSearch({
+    lang: dictationLang(),
+    onResult: (transcript) =>
+      setDescription((current) => appendTranscript(current, transcript, 2000)),
+  })
+
   // Réinitialiser à la fermeture : rouvrir le formulaire doit présenter une
   // fiche vierge, pas la déclaration précédente.
   useEffect(() => {
@@ -518,6 +655,14 @@ function DeclareDialog({
       setError(null)
     }
   }, [open])
+
+  // Fermer le dialogue coupe une écoute en cours : sans cela, la phrase
+  // reconnue après la fermeture atterrirait dans un formulaire déjà réinitialisé.
+  useEffect(() => {
+    if (open) return
+    if (titleVoice.listening) titleVoice.toggle()
+    if (descriptionVoice.listening) descriptionVoice.toggle()
+  }, [open, titleVoice.listening, titleVoice.toggle, descriptionVoice.listening, descriptionVoice.toggle])
 
   const tooShort = title.trim().length < 3 || description.trim().length < 5 || priority === ""
 
@@ -545,7 +690,11 @@ function DeclareDialog({
       open={open}
       onClose={onClose}
       title="Declare a ticket"
-      description="Describe the problem you are facing. The support centre will route it."
+      description={
+        titleVoice.supported
+          ? "Describe the problem you are facing. Type it or press Dictate and speak. The support centre will route it."
+          : "Describe the problem you are facing. The support centre will route it."
+      }
       centerOnMobile
       footer={
         <>
@@ -566,9 +715,18 @@ function DeclareDialog({
           </p>
         )}
 
-        <label className="block space-y-1.5">
-          <span className="text-[13px] font-medium text-[#183b56]">Title</span>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <label
+              htmlFor="declare-ticket-title"
+              className="text-[13px] font-medium text-[#183b56]"
+            >
+              Title
+            </label>
+            <DictateButton voice={titleVoice} label="title" />
+          </div>
           <Input
+            id="declare-ticket-title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="The printer on floor 2 no longer prints"
@@ -578,11 +736,21 @@ function DeclareDialog({
           <span className="block text-[11.5px] text-slate-400">
             A short summary, in one line. At least 3 characters.
           </span>
-        </label>
+          <VoiceHint voice={titleVoice} />
+        </div>
 
-        <label className="block space-y-1.5">
-          <span className="text-[13px] font-medium text-[#183b56]">Description</span>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <label
+              htmlFor="declare-ticket-description"
+              className="text-[13px] font-medium text-[#183b56]"
+            >
+              Description
+            </label>
+            <DictateButton voice={descriptionVoice} label="description" />
+          </div>
           <Textarea
+            id="declare-ticket-description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="What happened, what you expected, and anything you already tried."
@@ -592,7 +760,8 @@ function DeclareDialog({
           <span className="block text-[11.5px] text-slate-400">
             The more context, the faster it is handled. At least 5 characters.
           </span>
-        </label>
+          <VoiceHint voice={descriptionVoice} />
+        </div>
 
         <label className="block space-y-1.5">
           <span className="text-[13px] font-medium text-[#183b56]">Priority level</span>
