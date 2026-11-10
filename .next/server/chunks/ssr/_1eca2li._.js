@@ -1,0 +1,3 @@
+module.exports=[90494,a=>{"use strict";var b=a.i(87924),c=a.i(72131),d=a.i(50944),e=a.i(47033),f=a.i(59305);a.s(["AuthGuard",0,function({children:a}){let g=(0,d.useRouter)(),[h,i]=(0,c.useState)(!1);return((0,c.useEffect)(()=>{let a=!0;return(0,e.reconcileSession)().then(b=>{if(a){if(!b)return void g.replace("/login");i(!0)}}),()=>{a=!1}},[g]),h)?(0,b.jsx)(b.Fragment,{children:a}):(0,b.jsx)(f.AuthLoadingScreen,{})}])},33354,(a,b,c)=>{"use strict";c._=function(a){return a&&a.__esModule?a:{default:a}}}];
+
+//# sourceMappingURL=_1eca2li._.js.map

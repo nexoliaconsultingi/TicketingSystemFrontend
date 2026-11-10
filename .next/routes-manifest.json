@@ -1,0 +1,236 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:file((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/]+\\.\\w+)/",
+      "destination": "/:file",
+      "internal": true,
+      "priority": true,
+      "missing": [
+        {
+          "type": "header",
+          "key": "x-nextjs-data"
+        }
+      ],
+      "statusCode": 308,
+      "regex": "^(?:/((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/]+\\.\\w+))/$"
+    },
+    {
+      "source": "/:notfile((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/\\.]+)",
+      "destination": "/:notfile/",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/\\.]+))$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/knowledge/[id]/edit",
+      "regex": "^/knowledge/([^/]+?)/edit(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/knowledge/(?<nxtPid>[^/]+?)/edit(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/analytics",
+      "regex": "^/admin/analytics(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/analytics(?:/)?$"
+    },
+    {
+      "page": "/admin/company",
+      "regex": "^/admin/company(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/company(?:/)?$"
+    },
+    {
+      "page": "/admin/departments",
+      "regex": "^/admin/departments(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/departments(?:/)?$"
+    },
+    {
+      "page": "/admin/experts",
+      "regex": "^/admin/experts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/experts(?:/)?$"
+    },
+    {
+      "page": "/admin/services",
+      "regex": "^/admin/services(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/services(?:/)?$"
+    },
+    {
+      "page": "/admin/sla",
+      "regex": "^/admin/sla(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/sla(?:/)?$"
+    },
+    {
+      "page": "/admin/tickets",
+      "regex": "^/admin/tickets(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/tickets(?:/)?$"
+    },
+    {
+      "page": "/admin/units",
+      "regex": "^/admin/units(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/units(?:/)?$"
+    },
+    {
+      "page": "/admin/users",
+      "regex": "^/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/users(?:/)?$"
+    },
+    {
+      "page": "/assets",
+      "regex": "^/assets(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/assets(?:/)?$"
+    },
+    {
+      "page": "/assigned",
+      "regex": "^/assigned(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/assigned(?:/)?$"
+    },
+    {
+      "page": "/knowledge",
+      "regex": "^/knowledge(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/knowledge(?:/)?$"
+    },
+    {
+      "page": "/knowledge/new",
+      "regex": "^/knowledge/new(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/knowledge/new(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/manual",
+      "regex": "^/manual(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/manual(?:/)?$"
+    },
+    {
+      "page": "/recommendations",
+      "regex": "^/recommendations(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/recommendations(?:/)?$"
+    },
+    {
+      "page": "/recommendations/new",
+      "regex": "^/recommendations/new(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/recommendations/new(?:/)?$"
+    },
+    {
+      "page": "/recommendations/published",
+      "regex": "^/recommendations/published(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/recommendations/published(?:/)?$"
+    },
+    {
+      "page": "/services",
+      "regex": "^/services(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/services(?:/)?$"
+    },
+    {
+      "page": "/settings",
+      "regex": "^/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/settings(?:/)?$"
+    },
+    {
+      "page": "/sla",
+      "regex": "^/sla(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/sla(?:/)?$"
+    },
+    {
+      "page": "/tickets",
+      "regex": "^/tickets(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tickets(?:/)?$"
+    },
+    {
+      "page": "/verify",
+      "regex": "^/verify(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/verify(?:/)?$"
+    },
+    {
+      "page": "/workflows",
+      "regex": "^/workflows(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/workflows(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
