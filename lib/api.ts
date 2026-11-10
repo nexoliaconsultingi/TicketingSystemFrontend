@@ -1,8 +1,12 @@
-// const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3320"
+const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
+if (!RAW_API_BASE_URL) {
+  throw new Error(
+    "NEXT_PUBLIC_API_URL is missing. Check the Frontend environment configuration."
+  );
+}
 
-
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
+export const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, "");
 
 export class ApiError extends Error {
   readonly status: number
