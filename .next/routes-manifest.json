@@ -6,26 +6,12 @@
   "basePath": "",
   "redirects": [
     {
-      "source": "/:file((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/]+\\.\\w+)/",
-      "destination": "/:file",
-      "internal": true,
-      "priority": true,
-      "missing": [
-        {
-          "type": "header",
-          "key": "x-nextjs-data"
-        }
-      ],
-      "statusCode": 308,
-      "regex": "^(?:/((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/]+\\.\\w+))/$"
-    },
-    {
-      "source": "/:notfile((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/\\.]+)",
-      "destination": "/:notfile/",
+      "source": "/:path+/",
+      "destination": "/:path+",
       "internal": true,
       "priority": true,
       "statusCode": 308,
-      "regex": "^(?:/((?!\\.well-known(?:/.*)?)(?:[^/]+/)*[^/\\.]+))$"
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
     }
   ],
   "headers": [],
