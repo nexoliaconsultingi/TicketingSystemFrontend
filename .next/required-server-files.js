@@ -43,7 +43,7 @@ self.__SERVER_FILES_MANIFEST={
         256,
         384
       ],
-      "path": "/_next/image",
+      "path": "/_next/image/",
       "loader": "default",
       "loaderFile": "",
       "domains": [],
@@ -80,7 +80,7 @@ self.__SERVER_FILES_MANIFEST={
     },
     "basePath": "",
     "sassOptions": {},
-    "trailingSlash": false,
+    "trailingSlash": true,
     "i18n": null,
     "productionBrowserSourceMaps": false,
     "excludeDefaultMomentLocales": true,
@@ -324,8 +324,7 @@ self.__SERVER_FILES_MANIFEST={
     "turbopack": {
       "root": "D:\\AAAA-TicketingSystemBackend\\TicketingSystemFrontend"
     },
-    "distDirRoot": ".next",
-    "supportsImmutableAssets": false
+    "distDirRoot": ".next"
   },
   "appDir": "D:\\AAAA-TicketingSystemBackend\\TicketingSystemFrontend",
   "relativeAppDir": "",
@@ -338,8 +337,6 @@ self.__SERVER_FILES_MANIFEST={
     ".next\\server\\functions-config-manifest.json",
     ".next\\server\\middleware-manifest.json",
     ".next\\server\\middleware-build-manifest.js",
-    ".next\\server\\middleware-react-loadable-manifest.js",
-    ".next\\react-loadable-manifest.json",
     ".next\\server\\app-paths-manifest.json",
     ".next\\app-path-routes-manifest.json",
     ".next\\server\\server-reference-manifest.js",

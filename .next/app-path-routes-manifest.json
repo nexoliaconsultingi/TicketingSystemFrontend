@@ -1,6 +1,6 @@
 {
-  "/_not-found/page": "/_not-found",
   "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
   "/admin/analytics/page": "/admin/analytics",
   "/admin/company/page": "/admin/company",
   "/admin/departments/page": "/admin/departments",
@@ -16,6 +16,7 @@
   "/knowledge/[id]/edit/page": "/knowledge/[id]/edit",
   "/knowledge/new/page": "/knowledge/new",
   "/knowledge/page": "/knowledge",
+  "/login/page": "/login",
   "/manual/page": "/manual",
   "/page": "/",
   "/recommendations/new/page": "/recommendations/new",
@@ -25,7 +26,6 @@
   "/settings/page": "/settings",
   "/sla/page": "/sla",
   "/tickets/page": "/tickets",
-  "/workflows/page": "/workflows",
   "/verify/page": "/verify",
-  "/login/page": "/login"
+  "/workflows/page": "/workflows"
 }
