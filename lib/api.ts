@@ -1,12 +1,9 @@
-const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+// const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3320"
 
-if (!RAW_API_BASE_URL && process.env.NODE_ENV === "production") {
-  throw new Error("NEXT_PUBLIC_API_URL is not configured");
-}
 
-export const API_BASE_URL = (
-  RAW_API_BASE_URL || "http://localhost:3320"
-).replace(/\/+$/, "");
+
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
+
 export class ApiError extends Error {
   readonly status: number
 

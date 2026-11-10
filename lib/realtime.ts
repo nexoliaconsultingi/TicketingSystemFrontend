@@ -11,15 +11,9 @@ import { io, type Socket } from "socket.io-client"
  * où rien n'écoute. Les deux variables peuvent pointer le même hôte, elles ne
  * répondent pas au même protocole.
  */
-const RAW_SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
+// const RAW_SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:3320"
 
-if (!RAW_SOCKET_URL && process.env.NODE_ENV === "production") {
-  throw new Error("NEXT_PUBLIC_SOCKET_URL is not configured");
-}
-
-export const SOCKET_URL = (
-  RAW_SOCKET_URL || "http://localhost:3320"
-).replace(/\/+$/, "");
+export const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL?.replace(/\/+$/, "");
 
 /**
  * Contenu de l'événement `tickets:updated`.

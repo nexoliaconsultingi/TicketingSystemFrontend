@@ -1,6 +1,6 @@
 {
-  "/_global-error/page": "app/_global-error/page.js",
   "/_not-found/page": "app/_not-found/page.js",
+  "/_global-error/page": "app/_global-error/page.js",
   "/admin/analytics/page": "app/admin/analytics/page.js",
   "/admin/company/page": "app/admin/company/page.js",
   "/admin/departments/page": "app/admin/departments/page.js",
@@ -16,7 +16,6 @@
   "/knowledge/[id]/edit/page": "app/knowledge/[id]/edit/page.js",
   "/knowledge/new/page": "app/knowledge/new/page.js",
   "/knowledge/page": "app/knowledge/page.js",
-  "/login/page": "app/login/page.js",
   "/manual/page": "app/manual/page.js",
   "/page": "app/page.js",
   "/recommendations/new/page": "app/recommendations/new/page.js",
@@ -26,6 +25,7 @@
   "/settings/page": "app/settings/page.js",
   "/sla/page": "app/sla/page.js",
   "/tickets/page": "app/tickets/page.js",
+  "/workflows/page": "app/workflows/page.js",
   "/verify/page": "app/verify/page.js",
-  "/workflows/page": "app/workflows/page.js"
+  "/login/page": "app/login/page.js"
 }
